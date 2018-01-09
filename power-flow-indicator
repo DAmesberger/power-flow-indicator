@@ -57,8 +57,7 @@ class PowerFlowIndicator(object):
         init_info = ['power-flow-indicator', "", category]
         self.app = appindicator.Indicator.new(*init_info)
         self.app.set_status(appindicator.IndicatorStatus.ACTIVE)
-        self.app.set_icon(os.path.join(self.icon_path, "pwi_icon.png"))
-
+        self.app.set_icon(os.path.join(self.icon_path, self.prime_select_query_icon()))
         self.app_menu = gtk.Menu()
         self.app_menu_quit = gtk.MenuItem('Quit')
         self.app_menu_quit.connect('activate', self.quit)
@@ -76,6 +75,14 @@ class PowerFlowIndicator(object):
 
     def quit(self, data=None):
         gtk.main_quit()
+
+    def prime_select_query_icon(self):
+        for line in self.run_cmd(['prime-select', 'query']).decode().split('\n'):
+            if 'nvidia' in line:
+                return 'nvidia_logo.svg'
+            elif 'intel' in line:
+                return 'intel_logo.svg'
+        return 'pwi_icon.png'
 
     def run_cmd(self, cmdlist):
         new_env = dict(os.environ)
